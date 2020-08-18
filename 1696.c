@@ -31,7 +31,7 @@ int main() {
     scanf("%d", &casosDeTeste);
 
     //Estrutura de repetição que será usado para controlar a quantidade de testes que o programa rodará.
-    while (casosDeTeste  > 0) {
+    while (casosDeTeste > 0) {
 
         //Leitura do número de valores inteiros que farão parte da atual instância de teste.
         scanf("%d", &quantidadeNumeros);
@@ -54,7 +54,7 @@ int main() {
             //leitura do valor entrará na sequência
             scanf("%d", &valorB);
 
-            alteraValor(&arvore, indice , valorB);
+            alteraValor(&arvore, 7, valorB);
             //A cada iteração deste laço deve ser realizado as novas contas para saber o resultado.
         }
 
@@ -94,17 +94,20 @@ void insArvoreIN(TREE *arv, int vr, int ordemDeInsercao) {
         (*arv)->esq = NULL;
         (*arv)->dir = NULL;
     } else {
-        if (!*arv)
+        if ((*arv)->indice%2 != 0 ) {
             insArvoreIN(&((*arv)->esq), vr, ordemDeInsercao);
-        else
+         //   printf("Insere a esquerda.\n");
+        } else {
+//            printf("Insere a direita.\n");
             insArvoreIN(&((*arv)->dir), vr, ordemDeInsercao);
+        }
     }
 }
 
 void alteraValor(TREE *arv, int indiceElemento, int novoValor) {
     TREE nohAux = NULL;
     nohAux = tPesq(&(*arv), indiceElemento);
-    if(nohAux) {
+    if (nohAux) {
         printf("Valor: %d | indice: %d\n ", nohAux->valor, nohAux->indice);
         nohAux->valor = novoValor;
     }
@@ -113,12 +116,10 @@ void alteraValor(TREE *arv, int indiceElemento, int novoValor) {
 TREE tPesq(TREE *arv, int indiceElemento) {
     if (!*arv)   //Elemento não encontrado
         return (NULL);
-    else
-    if (indiceElemento == (*arv)->indice) // Elemento encontrado na raiz
+    else if (indiceElemento == (*arv)->indice) // Elemento encontrado na raiz
         return (*arv);
-    else
-    if (indiceElemento < (*arv)->indice)
-        return (tPesq(&((*arv)->esq),indiceElemento));
+    else if ((*arv)->indice%2 != 0)
+        return (tPesq(&((*arv)->esq), indiceElemento));
     else
         return (tPesq(&((*arv)->dir), indiceElemento));
 }
