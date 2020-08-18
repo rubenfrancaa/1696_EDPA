@@ -31,7 +31,7 @@ int main() {
     scanf("%d", &casosDeTeste);
 
     //Estrutura de repetição que será usado para controlar a quantidade de testes que o programa rodará.
-    while (casosDeTeste > 0) {
+    while (casosDeTeste  > 0) {
 
         //Leitura do número de valores inteiros que farão parte da atual instância de teste.
         scanf("%d", &quantidadeNumeros);
