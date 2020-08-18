@@ -54,7 +54,7 @@ int main() {
             //leitura do valor entrará na sequência
             scanf("%d", &valorB);
 
-            alteraValor(&arvore, 5 , valorB);
+            alteraValor(&arvore, indice , valorB);
             //A cada iteração deste laço deve ser realizado as novas contas para saber o resultado.
         }
 
@@ -94,7 +94,7 @@ void insArvoreIN(TREE *arv, int vr, int ordemDeInsercao) {
         (*arv)->esq = NULL;
         (*arv)->dir = NULL;
     } else {
-        if (vr < (*arv)->valor)
+        if (!*arv)
             insArvoreIN(&((*arv)->esq), vr, ordemDeInsercao);
         else
             insArvoreIN(&((*arv)->dir), vr, ordemDeInsercao);
@@ -117,8 +117,53 @@ TREE tPesq(TREE *arv, int indiceElemento) {
     if (indiceElemento == (*arv)->indice) // Elemento encontrado na raiz
         return (*arv);
     else
-    if (indiceElemento < (*arv)->valor)
+    if (indiceElemento < (*arv)->indice)
         return (tPesq(&((*arv)->esq),indiceElemento));
     else
         return (tPesq(&((*arv)->dir), indiceElemento));
 }
+
+//HUFF arvoreHuffman(HUFF lista){
+//    HUFF primeiroNo, segundoNo, auxLista=lista;
+//    while(auxLista->prox){
+//        primeiroNo=auxLista;
+//        segundoNo=auxLista->prox;
+//        if(segundoNo){
+//            if(segundoNo->prox)
+//                lista=segundoNo->prox;
+//            else lista=NULL;
+//            primeiroNo->prox=NULL;
+//            segundoNo->prox=NULL;
+//            inserirOrdenadoListaFreq(&lista, '#',  primeiroNo->freq+segundoNo->freq, "", primeiroNo, segundoNo);
+//        }
+//        auxLista=lista;
+//    }
+//    return lista;
+//}
+
+//void inserirOrdenadoListaFreq(HUFF *lista, char let, int fre, string huf,HUFF esqN, HUFF dirN){
+//    HUFF novo = (HUFF) malloc(sizeof(struct noh));
+//    HUFF auxA = *lista, auxP = *lista;
+//    novo->letra = let;
+//    novo->freq = fre;
+//    if(!huf.empty()) (novo->huffman).assign(huf);
+//    novo->esq = esqN;
+//    novo->dir = dirN;
+//    if(*lista){
+//        if(novo->freq<=(*lista)->freq){
+//            novo->prox=*lista;
+//            *lista=novo;
+//        } else {
+//            while(auxP&&novo->freq > auxP->freq){
+//                auxA = auxP;
+//                auxP = auxP->prox;
+//            }
+//            auxA->prox=novo;
+//            novo->prox=auxP;
+//        }
+//
+//    } else {
+//        novo->prox=NULL;
+//        *lista = novo;
+//    }
+//}
