@@ -1,3 +1,10 @@
+/*
+ * Regra pra chamar função na ordem certa.
+2 numeros => altura = 1 => quantidade de níveis -1 = 2 => chama soma
+4 numeros => altura = 2 => chama subtrai
+8 numeros => altura = 3 => chama soma
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -8,21 +15,24 @@ struct noh {
 };
 typedef struct noh *TREE;
 
-void criaArvNegativa (TREE *arv);
 void insArvoreNegativos(TREE *arv);
 int soma(TREE *arv);
 int subtrai(TREE *arv);
-int apagaArv(TREE *arv);
+void apagaArv(TREE *arv);
+void calculaGanhador(int casosDeTeste, int resultado);
 
 int insArvoreIN(TREE *arv, int vr);
 void PesqIn (TREE arv);
 
 int main(){
-    int casosDeTeste, quantidadeNumeros, negativos, quantidadeSubstituicoes, alturaNegativos, valorSeq, i, resposta, teste, jogador;
-    //int resultadosSubs[]; //alocar em cada elemento, quanto devo somar ou subtrair da reposta
+    int casosDeTeste, quantidadeNumeros, negativos, quantidadeSubstituicoes, alturaNegativos, valor, i, j, nRespostas, resposta, teste, jogador;
+    int posSubstituicao; //alocar em cada elemento, quanto devo somar ou subtrair da reposta
     float tetoQuantNumeros;
     TREE arvore = NULL;
 
+    /* jogador = 1 => Sanches ganha se for par.
+     * jogador = -1 => Sanches ganha se for ímpar.
+     * */
     jogador = 1;
 
     //Leitura da quantidade de casos de teste existentes.
@@ -34,9 +44,16 @@ int main(){
         //Leitura do número de valores inteiros que farão parte da atual instância de teste.
         scanf("%d", &quantidadeNumeros);
 
+        //É calculado o número de potência 2 maior ou igual à quantidadeNumeros
         tetoQuantNumeros = pow(2,ceilf(log2f(quantidadeNumeros)));
 
+        //Criando vetor para trabalhar com as substituições
+        int vetorCompleto[quantidadeNumeros];
+
+        //Negativos representa a quantidade de nós pais que receberão as respostas das operações
         negativos = tetoQuantNumeros - 1;
+
+        //É calculado quantos níveis serão preenchidos com nós pais/respostas
         alturaNegativos = floor(log2f(negativos));
 
         //criaArvNegativa(&arvore);
@@ -50,47 +67,61 @@ int main(){
 
         //Laço para leitura e inserção dos valores na árvore.
         for (int i = 1; i <= quantidadeNumeros; i++) {
-            scanf("%d", &valorSeq);
-            insArvoreIN(&arvore, valorSeq);
+            scanf("%d", &valor);
+            vetorCompleto[i-1] = valor; //Guardando valores em um vetor
+            insArvoreIN(&arvore, valor);
         }
 
-
+        /* Primeira condicional verifica se a resposta é par ou não.
+         * A segunda condiciona interna verifica se o primeiro
+         * jogador é Sanches ou Rusa.
+         */
         teste = alturaNegativos % 2;
-        if(teste == 0){
+        if (teste == 0) {
             resposta = soma(&arvore);
-        }
-        else{
+        } else {
             resposta = subtrai(&arvore);
         }
-        //printf("reposta: %d\n", resposta);
-        if(resposta % 2 == 0){
-            if(jogador > 0){
-                printf("%d Sanches\n", resposta);
-            }
-            else{
-                printf("%d Rusa\n", resposta);
-            }
-        }
-        else{
-            if (jogador > 0){
-                printf("%d Rusa\n", resposta);
-            }
-            else{
-                printf("%d Sanches\n", resposta);
-            }
-        }
-        for(i=0;i<=quantidadeSubstituicoes;i++){
-            //etc
-        }
 
-        jogador = jogador * -1;
-        casosDeTeste -= 1;
+        calculaGanhador(casosDeTeste, resposta);
 
+        for (i=0;i<=quantidadeSubstituicoes;i++) {
+            scanf("%d", &posSubstituicao);
+            scanf("%d", &valor);
+            for (j = 0; j <= quantidadeNumeros - 1; j++) {
+                if (j == posSubstituicao - 1){ //quando encontrar o índice pra substituição
+                    if(valor < vetorCompleto[j]){
+                        resposta = resposta + (vetorCompleto[j]-valor);
+                    }
+                    if(valor > vetorCompleto[j]){
+                        resposta = resposta - (valor-vetorCompleto[j]);
+                    }
+                }
+                calculaGanhador(casosDeTeste,resposta);
+            }
+        }
     }
 
+    jogador = jogador * -1;
+    casosDeTeste -= 1;
+
+ }
+
+void calculaGanhador(int casosDeTeste, int resultado) {
+    if (casosDeTeste % 2 == 0) { //é par
+        if (abs(resultado) % 2 != 0) { //Resultado é Impar
+            printf("%d Sanches\n", resultado);
+        } else {
+            printf("%d Rusa\n", resultado);
+        }
+    } else {
+        if (abs(resultado) % 2 != 0) { //Resultado é Impar
+            printf("%d Rusa\n", resultado);
+        } else {
+            printf("%d Sanches\n", resultado);
+        }
+    }
 }
-
-
 
 void insArvoreNegativos (TREE *arv){
     if (*arv == NULL){
@@ -171,9 +202,22 @@ void PesqIn (TREE arv){
     }
 }
 
-int apagaArv(TREE *arv){
-    TREE tmp;
-    tmp = *arv;
-    free(tmp);
-    return NULL;
+void apagaArv(TREE *arv){
+    if (*arv)
+        return;
+    else {
+        apagaArv(&((*arv)->esq));
+        apagaArv(&((*arv)->dir));
+
+        free(*arv);
+    }
 }
+
+//void alteraValor(TREE *arv, int indiceElemento, int novoValor) {
+//    TREE nohAux = NULL;
+//    nohAux = tPesq(&(*arv), indiceElemento);
+//    if (nohAux != NULL) {
+//        // printf("Valor: %d | indice: %d\n ", nohAux->valor, nohAux->indice);
+//        nohAux->valor = novoValor;
+//    }
+//}
