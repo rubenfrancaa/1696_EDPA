@@ -12,6 +12,8 @@ struct noh {
 };
 typedef struct noh *TREE;
 
+void calculaGanhador(int casosDeTeste, int resultado);
+
 void PesqIn(TREE arv);
 
 void PesqPRE(TREE arv);
@@ -22,10 +24,26 @@ TREE tPesq(TREE *arv, int indiceElemento);
 
 void alteraValor(TREE *arv, int indiceElemento, int novoValor);
 
+int calcularArvore(TREE *arv, int quantidadeNumeros);
+
+void executaPrimeiraSoma(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNumeros);
+
+void executaSoma(TREE *arvoreAuxiliar, int quantidadeNumeros);
+
+void executaSubtracao(TREE *arvoreAuxiliar, int quantidadeNumeros);
+
+void apagaArvore(TREE *arv);
+
+int tRemove(TREE *arv, int vr);
+
+static TREE maiorABB(TREE *abb);
+
+void executaPrimeiraSomaImpar(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNumeros);
+
 int main() {
     // Instanciação das variáveis necessárias.
-    TREE arvore = NULL;
-    int casosDeTeste, quantidadeNumeros, quantidadeSubstituicoes, valorSeq, indice, valorB;
+    TREE arvore = NULL, arvoreAux = NULL;
+    int casosDeTeste, quantidadeNumeros, quantidadeSubstituicoes, valorSeq, indice, valorB, resultado;
 
     //Leitura da quantidade de casos de teste existentes.
     scanf("%d", &casosDeTeste);
@@ -44,24 +62,48 @@ int main() {
             scanf("%d", &valorSeq);
             insArvoreIN(&arvore, valorSeq, i);
         }
-        PesqPRE(arvore);
-        //Aqui deve ser realizado as contas para impressão de quem está ganhando até o momento.
+//        PesqPRE(arvore);
 
-        for (int i = 0; i < quantidadeSubstituicoes; i++) {
-            //Leitura do valor que identificará qual elemento da sequência deve ser alterado.
-            // @indice: Dado encontrado dentro de cada nó que indica em qual ordem ele foi inserido. Ex: nó raíz tem indice = 1;
-            scanf("%d", &indice);
-            //leitura do valor entrará na sequência
-            scanf("%d", &valorB);
+        resultado = calcularArvore(&arvore, quantidadeNumeros);
+        printf("%d ", resultado);
 
-            alteraValor(&arvore, 7, valorB);
-            //A cada iteração deste laço deve ser realizado as novas contas para saber o resultado.
+        calculaGanhador(casosDeTeste, resultado);
+        if (quantidadeSubstituicoes > 0) {
+            for (int i = 0; i < quantidadeSubstituicoes; i++) {
+                //Leitura do valor que identificará qual elemento da sequência deve ser alterado.
+                // @indice: Dado encontrado dentro de cada nó que indica em qual ordem ele foi inserido. Ex: nó raíz tem indice = 1;
+                scanf("%d", &indice);
+                //leitura do valor entrará na sequência
+                scanf("%d", &valorB);
+
+                alteraValor(&arvore, indice, valorB);
+//                PesqPRE(arvore);
+                //A cada iteração deste laço deve ser realizado as novas contas para saber o resultado.
+
+                resultado = calcularArvore(&arvore, quantidadeNumeros);
+                printf("%d ", resultado);
+                calculaGanhador(casosDeTeste, resultado);
+            }
         }
-
-
         casosDeTeste -= 1;
     }
 
+}
+
+void calculaGanhador(int casosDeTeste, int resultado) {
+    if (casosDeTeste % 2 == 0) { //é par
+        if (abs(resultado) % 2 != 0) { //Resultado é Impar
+            printf("Sanches\n");
+        } else {
+            printf("Rusa\n");
+        }
+    } else {
+        if (abs(resultado) % 2 != 0) { //Resultado é Impar
+            printf("Rusa\n");
+        } else {
+            printf("Sanches\n");
+        }
+    }
 }
 
 void PesqIn(TREE arv) {
@@ -94,12 +136,14 @@ void insArvoreIN(TREE *arv, int vr, int ordemDeInsercao) {
         (*arv)->esq = NULL;
         (*arv)->dir = NULL;
     } else {
-        if ((*arv)->indice%2 != 0 ) {
+        /* Inserção passa a ser organizada baseada no indice. Se o índice é par o valor é jogado para direita. Se é impar para esquerda.
+         * */
+        if (ordemDeInsercao % 2 != 0) {
             insArvoreIN(&((*arv)->esq), vr, ordemDeInsercao);
-         //   printf("Insere a esquerda.\n");
+//            printf("Insere a esquerda.\n");
         } else {
-//            printf("Insere a direita.\n");
             insArvoreIN(&((*arv)->dir), vr, ordemDeInsercao);
+//            printf("Insere a direita.\n");
         }
     }
 }
@@ -107,64 +151,203 @@ void insArvoreIN(TREE *arv, int vr, int ordemDeInsercao) {
 void alteraValor(TREE *arv, int indiceElemento, int novoValor) {
     TREE nohAux = NULL;
     nohAux = tPesq(&(*arv), indiceElemento);
-    if (nohAux) {
-        printf("Valor: %d | indice: %d\n ", nohAux->valor, nohAux->indice);
+    if (nohAux != NULL) {
+        // printf("Valor: %d | indice: %d\n ", nohAux->valor, nohAux->indice);
         nohAux->valor = novoValor;
     }
 }
 
 TREE tPesq(TREE *arv, int indiceElemento) {
-    if (!*arv)   //Elemento não encontrado
+    if (!*arv) {   //Elemento não encontrado
+//        printf("Elemento não encontrado");
         return (NULL);
-    else if (indiceElemento == (*arv)->indice) // Elemento encontrado na raiz
+    } else if (indiceElemento == (*arv)->indice) // Elemento encontrado na raiz
         return (*arv);
-    else if ((*arv)->indice%2 != 0)
-        return (tPesq(&((*arv)->esq), indiceElemento));
-    else
+    else if ((*arv)->indice % 2 == 0)
         return (tPesq(&((*arv)->dir), indiceElemento));
+    else
+        return (tPesq(&((*arv)->esq), indiceElemento));
 }
 
-//HUFF arvoreHuffman(HUFF lista){
-//    HUFF primeiroNo, segundoNo, auxLista=lista;
-//    while(auxLista->prox){
-//        primeiroNo=auxLista;
-//        segundoNo=auxLista->prox;
-//        if(segundoNo){
-//            if(segundoNo->prox)
-//                lista=segundoNo->prox;
-//            else lista=NULL;
-//            primeiroNo->prox=NULL;
-//            segundoNo->prox=NULL;
-//            inserirOrdenadoListaFreq(&lista, '#',  primeiroNo->freq+segundoNo->freq, "", primeiroNo, segundoNo);
-//        }
-//        auxLista=lista;
-//    }
-//    return lista;
-//}
+int calcularArvore(TREE *arv, int quantidadeNumeros) {
+    int resultado = 0, auxIndice = 0, quantNos = 0;
+    TREE arvoreAuxiliar = NULL, nohAux1 = NULL, nohAux2 = NULL;
 
-//void inserirOrdenadoListaFreq(HUFF *lista, char let, int fre, string huf,HUFF esqN, HUFF dirN){
-//    HUFF novo = (HUFF) malloc(sizeof(struct noh));
-//    HUFF auxA = *lista, auxP = *lista;
-//    novo->letra = let;
-//    novo->freq = fre;
-//    if(!huf.empty()) (novo->huffman).assign(huf);
-//    novo->esq = esqN;
-//    novo->dir = dirN;
-//    if(*lista){
-//        if(novo->freq<=(*lista)->freq){
-//            novo->prox=*lista;
-//            *lista=novo;
-//        } else {
-//            while(auxP&&novo->freq > auxP->freq){
-//                auxA = auxP;
-//                auxP = auxP->prox;
-//            }
-//            auxA->prox=novo;
-//            novo->prox=auxP;
-//        }
-//
-//    } else {
-//        novo->prox=NULL;
-//        *lista = novo;
-//    }
-//}
+    if (*arv) {
+        //SOMA
+        if (quantidadeNumeros % 2 != 0)
+            executaPrimeiraSomaImpar(&(*arv), &arvoreAuxiliar, quantidadeNumeros);
+        else
+            executaPrimeiraSoma(&(*arv), &arvoreAuxiliar, quantidadeNumeros);
+        if (arvoreAuxiliar) {
+            while (arvoreAuxiliar->esq != NULL) {
+                executaSubtracao(&arvoreAuxiliar, quantidadeNumeros);
+                executaSoma(&arvoreAuxiliar, quantidadeNumeros);
+            }
+
+            resultado = arvoreAuxiliar->valor;
+            apagaArvore(&arvoreAuxiliar);
+        } else if ((*arv)) {
+            resultado = (*arv)->valor;
+        }
+    } else {
+        return 0;
+    }
+    return resultado;
+}
+
+void executaPrimeiraSoma(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNumeros) {
+    int auxIndice = 0, resultado;
+    TREE nohAux1 = NULL, nohAux2 = NULL;
+
+    for (int i = 0; i < (quantidadeNumeros / 2); i++) {
+        if (i == 0) {
+//            printf("AQUI\n");
+            resultado = (*arv)->valor +
+                        (((*arv)->indice + 1) % 2 == 0 ? tPesq(&(*arv)->dir, (*arv)->indice + 1)->valor : tPesq(
+                                &(*arv)->esq, (*arv)->indice + 1)->valor);
+            insArvoreIN(&(*arvoreAuxiliar), resultado, (*arv)->indice);
+            auxIndice = 2;
+        } else {
+//            printf("AQUI 2\n");
+            nohAux1 = tPesq(&(*arv)->esq, auxIndice + 1);
+            if ((*arv)->dir != NULL) {
+                nohAux2 = tPesq(&(*arv)->dir, auxIndice + 2);
+                if (nohAux2)
+                    resultado = nohAux1->valor + nohAux2->valor;
+            } else
+                resultado = nohAux1->valor;
+
+            insArvoreIN(&(*arvoreAuxiliar), resultado, nohAux1->indice);
+            auxIndice = auxIndice + 2;
+            nohAux1 = NULL;
+            nohAux2 = NULL;
+        }
+    }
+
+}
+
+void executaSubtracao(TREE *arvoreAuxiliar, int quantidadeNumeros) {
+    int resultado = 0, auxIndice = 0;
+    TREE nohAux1 = NULL, nohAux2 = NULL;
+
+    for (int i = 0; i < (quantidadeNumeros / 4); i++) {
+        if (i == 0) {
+            resultado = (*arvoreAuxiliar)->valor - (*arvoreAuxiliar)->esq->valor;
+            (*arvoreAuxiliar)->valor = resultado;
+            tRemove(&(*arvoreAuxiliar), (*arvoreAuxiliar)->esq->valor);
+            auxIndice = 3;
+        } else {
+            nohAux1 = tPesq(&(*arvoreAuxiliar)->esq, auxIndice + 2);
+            nohAux2 = tPesq(&(*arvoreAuxiliar)->esq, auxIndice + 4);
+            resultado = nohAux1->valor - nohAux2->valor;
+            nohAux1->valor = resultado;
+            tRemove(&(*arvoreAuxiliar), nohAux2->valor);
+            auxIndice = nohAux2->indice;
+        }
+    }
+}
+
+void executaSoma(TREE *arvoreAuxiliar, int quantidadeNumeros) {
+    int auxIndice = 0, resultado;
+    TREE nohAux1 = NULL, nohAux2 = NULL;
+
+    for (int i = 0; i < (quantidadeNumeros / quantidadeNumeros); i++) {
+        if (i == 0) {
+
+            resultado = (*arvoreAuxiliar)->valor + (*arvoreAuxiliar)->esq->valor;
+            (*arvoreAuxiliar)->valor = resultado;
+            auxIndice = (*arvoreAuxiliar)->esq->indice;
+            tRemove(&(*arvoreAuxiliar), (*arvoreAuxiliar)->esq->valor);
+
+        } else {
+//            printf("AQUI 2\n");
+            nohAux1 = tPesq(&(*arvoreAuxiliar)->esq, auxIndice + 2);
+            nohAux2 = tPesq(&(*arvoreAuxiliar)->esq, auxIndice + 4);
+            resultado = nohAux1->valor + nohAux2->valor;
+            (*arvoreAuxiliar)->valor = resultado;
+            tRemove(&(*arvoreAuxiliar), (*arvoreAuxiliar)->esq->valor);
+            auxIndice = nohAux2->indice;
+            nohAux1 = NULL;
+            nohAux2 = NULL;
+        }
+    }
+
+}
+
+int tRemove(TREE *arv, int vr) {
+//    printf("VR: %d\n", vr);
+    TREE p;
+    if (!*arv) {
+        //printf("Elemento não encontrado.\n");
+        return 1; //Elemento não encontrado
+    }
+    if (vr == (*arv)->valor) { //caso o valor esteja na raiz
+        p = *arv;
+        if (!(*arv)->esq)
+            *arv = (*arv)->dir; // a raiz não tem filho esquerdo
+        else if (!(*arv)->dir)
+            *arv = (*arv)->esq; // a raiz não tem filho direito
+        else {
+            p = maiorABB(&((*arv)->esq));
+            (*arv)->valor = p->valor;
+        }
+        free(p);
+//        printf("Elemento encontrado e Removido\n");
+    } else {
+        tRemove(&((*arv)->esq), vr); //Procura na subarvore Esquerda
+    }
+}
+
+static TREE maiorABB(TREE *abb) {
+    TREE p = *abb;
+    if (*abb)
+        if (p->dir == NULL) {
+            *abb = (*abb)->esq;
+            return p;
+        }
+    return maiorABB(&((*abb)->dir));
+}
+
+void apagaArvore(TREE *arv) {
+    if (*arv)
+        return;
+    else {
+        apagaArvore(&((*arv)->esq));
+        apagaArvore(&((*arv)->dir));
+
+        free(*arv);
+    }
+}
+
+void executaPrimeiraSomaImpar(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNumeros) {
+    int auxIndice = 0, resultado;
+    TREE nohAux1 = NULL, nohAux2 = NULL;
+    if (quantidadeNumeros % 2 != 0)
+        insArvoreIN(&(*arvoreAuxiliar), 0, 0);
+    for (int i = 0; i < (quantidadeNumeros - 1); i++) {
+        if (i == 0) {
+//            printf("AQUI\n");
+            resultado = (*arv)->valor +
+                        (((*arv)->indice + 1) % 2 == 0 ? tPesq(&(*arv)->dir, (*arv)->indice + 1)->valor : tPesq(
+                                &(*arv)->esq, (*arv)->indice + 1)->valor);
+            insArvoreIN(&(*arvoreAuxiliar), resultado, (*arv)->indice);
+            auxIndice = 2;
+        } else {
+//            printf("AQUI 2\n");
+            nohAux1 = tPesq(&(*arv)->esq, auxIndice + 1);
+            if ((*arv)->dir != NULL) {
+                nohAux2 = tPesq(&(*arv)->dir, auxIndice + 2);
+                if (nohAux2)
+                    resultado = nohAux1->valor + nohAux2->valor;
+            } else
+                resultado = nohAux1->valor;
+
+            insArvoreIN(&(*arvoreAuxiliar), resultado, nohAux1->indice);
+            auxIndice = auxIndice + 2;
+            nohAux1 = NULL;
+            nohAux2 = NULL;
+        }
+    }
+
+}
