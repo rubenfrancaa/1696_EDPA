@@ -84,20 +84,21 @@ int main(){
         }
 
         calculaGanhador(casosDeTeste, resposta);
-
-        for (i=0;i<=quantidadeSubstituicoes;i++) {
-            scanf("%d", &posSubstituicao);
-            scanf("%d", &valor);
-            for (j = 0; j <= quantidadeNumeros - 1; j++) {
-                if (j == posSubstituicao - 1){ //quando encontrar o índice pra substituição
-                    if(valor < vetorCompleto[j]){
-                        resposta = resposta + (vetorCompleto[j]-valor);
+        if (quantidadeSubstituicoes > 0) {
+            for (i = 0; i <= quantidadeSubstituicoes; i++) {
+                scanf("%d", &posSubstituicao);
+                scanf("%d", &valor);
+                for (j = 0; j <= quantidadeNumeros - 1; j++) {
+                    if (j == posSubstituicao - 1) { //quando encontrar o índice pra substituição
+                        if (valor < vetorCompleto[j]) {
+                            resposta = resposta + (vetorCompleto[j] - valor);
+                        }
+                        if (valor > vetorCompleto[j]) {
+                            resposta = resposta - (valor - vetorCompleto[j]);
+                        }
                     }
-                    if(valor > vetorCompleto[j]){
-                        resposta = resposta - (valor-vetorCompleto[j]);
-                    }
+                    calculaGanhador(casosDeTeste, resposta);
                 }
-                calculaGanhador(casosDeTeste,resposta);
             }
         }
     }
