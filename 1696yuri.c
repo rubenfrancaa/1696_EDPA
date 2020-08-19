@@ -143,7 +143,7 @@ int insArvoreIN (TREE *arv, int vr) {
         (*arv)->info = vr;
         (*arv)->esq = NULL;
         (*arv)->dir = NULL;
-        return -2;
+        return -2 ;
     }
     if((*arv)->info == -1){
         if(insArvoreIN(&((*arv)->esq), vr) == -2){
