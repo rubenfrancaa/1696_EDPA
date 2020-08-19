@@ -1,0 +1,179 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+struct noh {
+    int info;
+    struct noh *esq, *dir;
+};
+typedef struct noh *TREE;
+
+void criaArvNegativa (TREE *arv);
+void insArvoreNegativos(TREE *arv);
+int soma(TREE *arv);
+int subtrai(TREE *arv);
+int apagaArv(TREE *arv);
+
+int insArvoreIN(TREE *arv, int vr);
+void PesqIn (TREE arv);
+
+int main(){
+    int casosDeTeste, quantidadeNumeros, negativos, quantidadeSubstituicoes, alturaNegativos, valorSeq, i, resposta, teste, jogador;
+    //int resultadosSubs[]; //alocar em cada elemento, quanto devo somar ou subtrair da reposta
+    float tetoQuantNumeros;
+    TREE arvore = NULL;
+
+    jogador = 1;
+
+    //Leitura da quantidade de casos de teste existentes.
+    scanf("%d", &casosDeTeste);
+
+    //Estrutura de repetição que será usado para controlar a quantidade de testes que o programa rodará.
+    while (casosDeTeste  > 0) {
+
+        //Leitura do número de valores inteiros que farão parte da atual instância de teste.
+        scanf("%d", &quantidadeNumeros);
+
+        tetoQuantNumeros = pow(2,ceilf(log2f(quantidadeNumeros)));
+
+        negativos = tetoQuantNumeros - 1;
+        alturaNegativos = floor(log2f(negativos));
+
+        //criaArvNegativa(&arvore);
+        //Inserindo todos os elementos negativos
+        for(i=0 ; i<=alturaNegativos ; i++){
+            insArvoreNegativos(&arvore);
+        }
+
+        //Leitura da quantidade de substituições serão feitas.
+        scanf("%d", &quantidadeSubstituicoes);
+
+        //Laço para leitura e inserção dos valores na árvore.
+        for (int i = 1; i <= quantidadeNumeros; i++) {
+            scanf("%d", &valorSeq);
+            insArvoreIN(&arvore, valorSeq);
+        }
+
+
+        teste = alturaNegativos % 2;
+        if(teste == 0){
+            resposta = soma(&arvore);
+        }
+        else{
+            resposta = subtrai(&arvore);
+        }
+        //printf("reposta: %d\n", resposta);
+        if(resposta % 2 == 0){
+            if(jogador > 0){
+                printf("%d Sanches\n", resposta);
+            }
+            else{
+                printf("%d Rusa\n", resposta);
+            }
+        }
+        else{
+            if (jogador > 0){
+                printf("%d Rusa\n", resposta);
+            }
+            else{
+                printf("%d Sanches\n", resposta);
+            }
+        }
+        for(i=0;i<=quantidadeSubstituicoes;i++){
+            //etc
+        }
+
+        jogador = jogador * -1;
+        casosDeTeste -= 1;
+
+    }
+
+}
+
+
+
+void insArvoreNegativos (TREE *arv){
+    if (*arv == NULL){
+        *arv = (TREE) malloc (sizeof (struct noh));
+        (*arv)->info = -1;
+        (*arv)->esq = NULL;
+        (*arv)->dir = NULL;
+    }else{
+        insArvoreNegativos(&((*arv)->esq));
+        insArvoreNegativos(&((*arv)->dir));
+    }
+}
+
+int insArvoreIN (TREE *arv, int vr) {
+    int valor;
+    if (*arv == NULL) {
+        valor = vr;
+        *arv = (TREE) malloc(sizeof(struct noh));
+        (*arv)->info = vr;
+        (*arv)->esq = NULL;
+        (*arv)->dir = NULL;
+        return -2;
+    }
+    if((*arv)->info == -1){
+        if(insArvoreIN(&((*arv)->esq), vr) == -2){
+            return;
+        }
+        insArvoreIN(&((*arv)->dir), vr);
+        }
+}
+
+int soma(TREE *arv){
+    int valor;
+    //Condição caso um nó filho seja nulo, retorna 0
+    if(*arv == NULL){
+        return 0;
+    }
+    //Condição de parada na raiz e raiz
+    if((*arv)->esq == NULL && (*arv)->dir == NULL){
+        valor = (*arv)->info;
+        //apagaArv(*arv);
+        (*arv) = NULL;
+        return valor;
+    }
+    //nó pai recebe a soma dos nós filhos
+    if((*arv)->esq != NULL || (*arv)->dir != NULL){
+        (*arv)->info = subtrai(&((*arv)->esq)) + subtrai(&((*arv)->dir));
+        return subtrai(arv);
+    }
+}
+
+int subtrai(TREE *arv) {
+    int valor;
+    //Condição caso um nó filho seja nulo, retorna 0
+    if (*arv == NULL) {
+        return 0;
+    }
+    //Condição de parada na raiz e nó folha
+    if ((*arv)->esq == NULL && (*arv)->dir == NULL) {
+        valor = (*arv)->info;
+        //apagaArv(*arv);
+        (*arv) = NULL;
+        return valor;
+    }
+    //nó pai recebe a soma dos nós filhos, apaga filhos(dentro da recurssão) e chama função novamente
+    if ((*arv)->esq != NULL || (*arv)->dir != NULL) {
+        (*arv)->info = soma(&((*arv)->esq)) - soma(&((*arv)->dir));
+        return soma(arv);
+    }
+}
+
+void PesqIn (TREE arv){
+//Infixa
+    if (arv != NULL){
+        PesqIn (arv->esq);
+        printf ("%i ",arv->info);
+        PesqIn (arv->dir);
+    }
+}
+
+int apagaArv(TREE *arv){
+    TREE tmp;
+    tmp = *arv;
+    free(tmp);
+    return NULL;
+}
