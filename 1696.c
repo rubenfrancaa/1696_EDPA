@@ -10,10 +10,6 @@ typedef struct noh *TREE;
 
 void calculaGanhador(int casosDeTeste, int resultado);
 
-void PesqIn(TREE arv);
-
-void PesqPRE(TREE arv);
-
 void insArvoreIN(TREE *arv, int vr, int ordemDeInsercao);
 
 TREE tPesq(TREE *arv, int indiceElemento);
@@ -104,29 +100,6 @@ void calculaGanhador(int casosDeTeste, int resultado) {
         }
     }
 }
-
-void PesqIn(TREE arv) {
-//Infixa
-
-    if (arv != NULL) {
-        PesqIn(arv->esq);
-        printf("%i ", arv->valor);
-        printf("indice: %d \n", arv->indice);
-        PesqIn(arv->dir);
-    }
-}
-
-void PesqPRE(TREE arv) {
-//Pre Fixa
-
-    if (arv != NULL) {
-        printf("%i ", arv->valor);
-        printf("indice: %d \n", arv->indice);
-        PesqIn(arv->esq);
-        PesqIn(arv->dir);
-    }
-}
-
 void insArvoreIN(TREE *arv, int vr, int ordemDeInsercao) {
     if (*arv == NULL) {
         *arv = (TREE) malloc(sizeof(struct noh));
@@ -151,14 +124,12 @@ void alteraValor(TREE *arv, int indiceElemento, int novoValor) {
     TREE nohAux = NULL;
     nohAux = tPesq(&(*arv), indiceElemento);
     if (nohAux != NULL) {
-        // printf("Valor: %d | indice: %d\n ", nohAux->valor, nohAux->indice);
         nohAux->valor = novoValor;
     }
 }
 
 TREE tPesq(TREE *arv, int indiceElemento) {
     if (!*arv) {   //Elemento não encontrado
-//        printf("Elemento não encontrado");
         return (NULL);
     } else if (indiceElemento == (*arv)->indice) // Elemento encontrado na raiz
         return (*arv);
@@ -173,7 +144,6 @@ int calcularArvore(TREE *arv, int quantidadeNumeros) {
     TREE arvoreAuxiliar = NULL, nohAux1 = NULL, nohAux2 = NULL;
 
     if (*arv) {
-        //SOMA
         if (quantidadeNumeros % 2 == 0) { //é par
             executaPrimeiraSomaPar(&(*arv), &arvoreAuxiliar, quantidadeNumeros);
             if (arvoreAuxiliar) {
