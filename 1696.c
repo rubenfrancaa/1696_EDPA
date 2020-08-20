@@ -72,7 +72,7 @@ int main() {
                 //leitura do valor entrará na sequência
                 scanf("%d", &valorB);
 
-              //  printf ("Indice [%d] - Valor [%d]\n",indice,valorB);
+                //  printf ("Indice [%d] - Valor [%d]\n",indice,valorB);
                 alteraValor(&arvore, indice, valorB);
 
                 //A cada iteração deste laço deve ser realizado as novas contas para saber o resultado.
@@ -189,7 +189,8 @@ int calcularArvore(TREE *arv, int quantidadeNumeros) {
             if (arvoreAuxiliar) {
                 while (arvoreAuxiliar->esq != NULL) {
                     executaSubtracao(&arvoreAuxiliar, quantidadeNumeros);
-                    executaSoma(&arvoreAuxiliar, quantidadeNumeros);
+                    if (arvoreAuxiliar->esq != NULL)
+                        executaSoma(&arvoreAuxiliar, quantidadeNumeros);
                 }
                 resultado = arvoreAuxiliar->valor;
                 apagaArvore(&arvoreAuxiliar);
@@ -209,7 +210,8 @@ void executaPrimeiraSomaPar(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNumer
     for (i = 0; i < (quantidadeNumeros / 2); i++) {
         if (i == 0) {
             resultado = (*arv)->valor +
-                        (((*arv)->indice + 1) % 2 == 0 ? tPesq(&(*arv)->dir, (*arv)->indice + 1)->valor : tPesq(&(*arv)->esq, (*arv)->indice + 1)->valor);
+                        (((*arv)->indice + 1) % 2 == 0 ? tPesq(&(*arv)->dir, (*arv)->indice + 1)->valor : tPesq(
+                                &(*arv)->esq, (*arv)->indice + 1)->valor);
             insArvoreIN(&(*arvoreAuxiliar), resultado, (*arv)->indice);
             auxIndice = 2;
         } else {
@@ -230,20 +232,22 @@ void executaPrimeiraSomaPar(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNumer
 }
 
 void executaPrimeiraSomaImpar(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNumeros) {
-    int auxIndice = 0, resultado, i;
+    int auxIndice = 0, resultado, i, aux = 0;
     TREE nohAux1 = NULL, nohAux2 = NULL;
 
-    for (i = 0; i < (quantidadeNumeros / 2); i++) {
+    for (i = 0; i < (quantidadeNumeros / 2) + 1; i++) {
         if (i == 0) {
 //            printf("AQUI\n");
-            resultado = (*arv)->valor +
-                        (((*arv)->indice + 1) % 2 == 0 ? tPesq(&(*arv)->dir, (*arv)->indice + 1)->valor : tPesq(
-                                &(*arv)->esq, (*arv)->indice + 1)->valor);
+            if (((*arv)->indice + 1) % 2 == 0) {
+                if ((*arv)->dir)
+                    aux = tPesq(&(*arv)->dir, (*arv)->indice + 1)->valor;
+            }
+            resultado = (*arv)->valor + aux;
+
             insArvoreIN(&(*arvoreAuxiliar), resultado, (*arv)->indice);
             auxIndice = 2;
         } else {
 //            printf("AQUI 2\n");
-
             if (auxIndice != (quantidadeNumeros - 1)) {
                 nohAux1 = tPesq(&(*arv)->esq, auxIndice + 1);
                 if ((*arv)->dir != NULL) {
@@ -258,17 +262,18 @@ void executaPrimeiraSomaImpar(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNum
                 nohAux1 = NULL;
                 nohAux2 = NULL;
             }
-            if (auxIndice + 1 == quantidadeNumeros) {
+            else if (auxIndice == (quantidadeNumeros-1)) {
                 nohAux1 = tPesq(&(*arv), (auxIndice + 1));
                 insArvoreIN(&(*arvoreAuxiliar), nohAux1->valor, auxIndice + 1);
             }
         }
+
     }
 
 }
 
 void executaSubtracao(TREE *arvoreAuxiliar, int quantidadeNumeros) {
-    int resultado = 0, auxIndice = 0,i;
+    int resultado = 0, auxIndice = 0, i;
     TREE nohAux1 = NULL, nohAux2 = NULL;
 
     for (i = 0; i < (quantidadeNumeros / 4); i++) {
@@ -286,10 +291,15 @@ void executaSubtracao(TREE *arvoreAuxiliar, int quantidadeNumeros) {
             auxIndice = nohAux2->indice;
         }
     }
+    if (quantidadeNumeros / 4 <= 0) {
+        resultado = (*arvoreAuxiliar)->valor - (*arvoreAuxiliar)->esq->valor;
+        (*arvoreAuxiliar)->valor = resultado;
+        tRemove(&(*arvoreAuxiliar), (*arvoreAuxiliar)->esq->valor);
+    }
 }
 
 void executaSoma(TREE *arvoreAuxiliar, int quantidadeNumeros) {
-    int auxIndice = 0, resultado,i;
+    int auxIndice = 0, resultado, i;
     TREE nohAux1 = NULL, nohAux2 = NULL;
 
     for (i = 0; i < (quantidadeNumeros / quantidadeNumeros); i++) {
