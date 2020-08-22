@@ -8,18 +8,28 @@ struct noh {
 };
 typedef struct noh *TREE;
 
+void PesqPRE(TREE arv);
+
+void PesqIN(TREE arv);
+
 void insArvoreNegativos(TREE *arv);
+
 int soma(TREE *arv);
+
 int subtrai(TREE *arv);
+
 void apagaArv(TREE *arv);
+
 int solucionaArv(TREE *arv, int teste);
+
 void calculaGanhador(int casosDeTeste, int resultado);
+
 int insArvoreIN(TREE *arv, int vr);
 
 
-int main(){
+int main() {
     int casosDeTeste, quantidadeNumeros, negativos, quantidadeSubstituicoes, alturaNegativos, valor, i, j, resposta, teste, jogador;
-    int valorA, valorB; //alocar em cada elemento, quanto devo somar ou subtrair da reposta
+    int valorA, valorB, aux; //alocar em cada elemento, quanto devo somar ou subtrair da reposta
     float tetoQuantNumeros;
     TREE arvore = NULL;
 
@@ -32,7 +42,7 @@ int main(){
     scanf("%d", &casosDeTeste);
 
     //Estrutura de repetição que será usado para controlar a quantidade de testes que o programa rodará.
-    while (casosDeTeste  > 0) {
+    while (casosDeTeste > 0) {
 
         TREE arvore = NULL;
 
@@ -43,7 +53,7 @@ int main(){
         tetoQuantNumeros = pow(2, ceilf(log2f(quantidadeNumeros)));
 
         //Criando vetor para trabalhar com as substituições
-        int vetorCompleto[(int)tetoQuantNumeros];
+        int vetorCompleto[(int) tetoQuantNumeros];
 
         //Negativos representa a quantidade de nós pais que receberão as respostas das operações
         negativos = tetoQuantNumeros - 1;
@@ -62,12 +72,12 @@ int main(){
 
         //Laço para leitura e inserção dos valores na árvore.
 
-        for (int i = 1; i <= quantidadeNumeros; i++) {
+        for (i = 1; i <= quantidadeNumeros; i++) {
             scanf("%d", &valor);
             vetorCompleto[i - 1] = valor; //Guardando valores em um vetor
         }
 
-        for(i=quantidadeNumeros ; i<tetoQuantNumeros; i++){
+        for (i = quantidadeNumeros; i < tetoQuantNumeros; i++) {
             vetorCompleto[i] = 0;
         }
 
@@ -79,39 +89,41 @@ int main(){
         teste = alturaNegativos % 2;
 
         resposta = solucionaArv(&arvore, teste);
+//        PesqPRE(arvore);
+        printf("\nResposta - [%d]\n", resposta);
+//        calculaGanhador(jogador, resposta);
 
-        calculaGanhador(jogador, resposta);
 
-        if(quantidadeSubstituicoes != 0){
-            for (i = 0; i < quantidadeSubstituicoes; i++) {
-                scanf("%d", &valorA);
-                scanf("%d", &valorB);
-                vetorCompleto[valorA - 1] = valorB;
+        /*  if (quantidadeSubstituicoes != 0) {
+              for (i = 0; i < quantidadeSubstituicoes; i++) {
+                  scanf("%d", &valorA);
+                  scanf("%d", &valorB);
 
-                //liberar árvore
-                arvore = NULL;
+                  if (resposta < 0) {
+                      aux =  abs(vetorCompleto[valorA - 1] - valorB);
+                      printf("Aux: [%d] - Valor do Vetor ", aux);
+                      if (aux < 0)
+                          resposta = resposta + aux;
+                      else {
+                          if (i > 1) {
+                              printf("ALOU");
+                              resposta = resposta + aux;
+                          } else
+                              resposta = resposta - aux;
+                      }
+                  } else if (valorB < 0)
+                      resposta = resposta - abs(vetorCompleto[valorA - 1] - valorB);
+                  else
+                      resposta = resposta + abs(vetorCompleto[valorA - 1] - valorB);
+                  printf("[%d] Resultado - ", vetorCompleto[valorA-1]);
+                  calculaGanhador(jogador, resposta);
+              }
+          }*/
 
-                for (j = 0; j <= alturaNegativos; j++) {
-                    insArvoreNegativos(&arvore);
-                }
-
-                for (j = 0; j < tetoQuantNumeros; j++) {
-                    insArvoreIN(&arvore, vetorCompleto[j]);
-                }
-
-                resposta = solucionaArv(&arvore, teste);
-
-                calculaGanhador(jogador, resposta);
-            }
-        }
-
-    casosDeTeste = casosDeTeste - 1;
-    jogador = jogador * -1;
-
-    free(arvore);
-
+        casosDeTeste = casosDeTeste - 1;
+        jogador = jogador * -1;
     }
-
+    return 0;
 }
 
 
@@ -131,19 +143,39 @@ void calculaGanhador(int jogador, int resultado) {
     }
 }
 
-void insArvoreNegativos (TREE *arv){
-    if (*arv == NULL){
-        *arv = (TREE) malloc (sizeof (struct noh));
+void PesqIn(TREE arv) {
+//Infixa
+
+    if (arv != NULL) {
+        PesqIn(arv->esq);
+        printf("%i ", arv->info);
+        PesqIn(arv->dir);
+    }
+}
+
+void PesqPRE(TREE arv) {
+//Pre Fixa
+
+    if (arv != NULL) {
+        printf("%i ", arv->info);
+        PesqIn(arv->esq);
+        PesqIn(arv->dir);
+    }
+}
+
+void insArvoreNegativos(TREE *arv) {
+    if (*arv == NULL) {
+        *arv = (TREE) malloc(sizeof(struct noh));
         (*arv)->info = -1;
         (*arv)->esq = NULL;
         (*arv)->dir = NULL;
-    }else{
+    } else {
         insArvoreNegativos(&((*arv)->esq));
         insArvoreNegativos(&((*arv)->dir));
     }
 }
 
-int insArvoreIN (TREE *arv, int vr) {
+int insArvoreIN(TREE *arv, int vr) {
     int valor;
     if (*arv == NULL) {
         valor = vr;
@@ -153,48 +185,47 @@ int insArvoreIN (TREE *arv, int vr) {
         (*arv)->dir = NULL;
         return -2;
     }
-    if((*arv)->info == -1){
-        if(insArvoreIN(&((*arv)->esq), vr) == -2){
+    if ((*arv)->info == -1) {
+        if (insArvoreIN(&((*arv)->esq), vr) == -2) {
             return;
         }
         insArvoreIN(&((*arv)->dir), vr);
-        }
+    }
 }
 
-int solucionaArv(TREE *arv, int teste){
+int solucionaArv(TREE *arv, int teste) {
     int resposta;
     if (teste == 0) {
-        resposta = soma(arv);
+        resposta = soma(&(*arv));
         return resposta;
     } else {
-        resposta = subtrai(arv);
+        resposta = subtrai(&(*arv));
         return resposta;
     }
 }
 
-int soma(TREE *arv){
+int soma(TREE *arv) {
     int valor;
     //Condição caso um nó filho seja nulo, retorna 0
-    if(*arv == NULL){
+    if (*arv == NULL) {
         return 0;
     }
     //Condição de parada na raiz e raiz
-    if((*arv)->esq == NULL && (*arv)->dir == NULL){
-        if((*arv)->info == -1){
+    if ((*arv)->esq == NULL && (*arv)->dir == NULL) {
+        if ((*arv)->info == -1) {
             valor = 0;
             //apagaArv(*arv);
             (*arv) = NULL;
             return valor;
-        }
-        else{
-        valor = (*arv)->info;
-        //apagaArv(*arv);
-        (*arv) = NULL;
-        return valor;
+        } else {
+            valor = (*arv)->info;
+            //apagaArv(*arv);
+            (*arv) = NULL;
+            return valor;
         }
     }
     //nó pai recebe a soma dos nós filhos
-    if((*arv)->esq != NULL || (*arv)->dir != NULL){
+    if ((*arv)->esq != NULL || (*arv)->dir != NULL) {
         (*arv)->info = subtrai(&((*arv)->esq)) + subtrai(&((*arv)->dir));
         return subtrai(arv);
     }
@@ -208,16 +239,15 @@ int subtrai(TREE *arv) {
     }
     //Condição de parada na raiz e nó folha
     if ((*arv)->esq == NULL && (*arv)->dir == NULL) {
-        if ((*arv)->info == -1){
+        if ((*arv)->info == -1) {
             valor = 0;
             //apagaArv(*arv);
-            (*arv) = NULL;
+//            (*arv) = NULL;
             return valor;
-        }
-        else {
+        } else {
             valor = (*arv)->info;
             //apagaArv(*arv);
-            (*arv) = NULL;
+//            (*arv) = NULL;
             return valor;
         }
     }
@@ -228,7 +258,7 @@ int subtrai(TREE *arv) {
     }
 }
 
-void apagaArv(TREE *arv){
+void apagaArv(TREE *arv) {
     if (*arv)
         return;
     else {

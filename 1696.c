@@ -26,16 +26,14 @@ void apagaArvore(TREE *arv);
 
 int tRemove(TREE *arv, int vr);
 
-static TREE maiorABB(TREE *abb);
-
 void executaPrimeiraSomaImpar(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNumeros);
 
 void executaPrimeiraSomaPar(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNumeros);
 
 int main() {
     // Instanciação das variáveis necessárias.
-    TREE arvore = NULL, arvoreAux = NULL;
-    int casosDeTeste, quantidadeNumeros, quantidadeSubstituicoes, valorSeq, indice, valorB, resultado, i;
+    TREE arvore = NULL;
+    int casosDeTeste, quantidadeNumeros = 0, quantidadeSubstituicoes = 0, valorSeq, indice, valorB, resultado, i;
 
     //Leitura da quantidade de casos de teste existentes.
     scanf("%d", &casosDeTeste);
@@ -50,16 +48,17 @@ int main() {
         scanf("%d", &quantidadeSubstituicoes);
 
         //Laço para leitura e inserção dos valores na árvore.
+
         for (i = 1; i <= quantidadeNumeros; i++) {
             scanf("%d", &valorSeq);
             insArvoreIN(&arvore, valorSeq, i);
         }
-//        PesqPRE(arvore);
+
 
         resultado = calcularArvore(&arvore, quantidadeNumeros);
         printf("%d ", resultado);
-
         calculaGanhador(casosDeTeste, resultado);
+
         if (quantidadeSubstituicoes > 0) {
             for (i = 0; i < quantidadeSubstituicoes; i++) {
                 //Leitura do valor que identificará qual elemento da sequência deve ser alterado.
@@ -68,21 +67,19 @@ int main() {
                 //leitura do valor entrará na sequência
                 scanf("%d", &valorB);
 
-                //  printf ("Indice [%d] - Valor [%d]\n",indice,valorB);
                 alteraValor(&arvore, indice, valorB);
 
                 //A cada iteração deste laço deve ser realizado as novas contas para saber o resultado.
-
                 resultado = calcularArvore(&arvore, quantidadeNumeros);
                 printf("%d ", resultado);
                 calculaGanhador(casosDeTeste, resultado);
             }
         }
         apagaArvore(&arvore);
-        arvore = NULL;
+
         casosDeTeste -= 1;
     }
-
+    return 0;
 }
 
 void calculaGanhador(int casosDeTeste, int resultado) {
@@ -100,6 +97,7 @@ void calculaGanhador(int casosDeTeste, int resultado) {
         }
     }
 }
+
 void insArvoreIN(TREE *arv, int vr, int ordemDeInsercao) {
     if (*arv == NULL) {
         *arv = (TREE) malloc(sizeof(struct noh));
@@ -140,8 +138,8 @@ TREE tPesq(TREE *arv, int indiceElemento) {
 }
 
 int calcularArvore(TREE *arv, int quantidadeNumeros) {
-    int resultado = 0, auxIndice = 0, quantNos = 0;
-    TREE arvoreAuxiliar = NULL, nohAux1 = NULL, nohAux2 = NULL;
+    int resultado = 0;
+    TREE arvoreAuxiliar = NULL;
 
     if (*arv) {
         if (quantidadeNumeros % 2 == 0) { //é par
@@ -163,13 +161,12 @@ int calcularArvore(TREE *arv, int quantidadeNumeros) {
                         executaSoma(&arvoreAuxiliar, quantidadeNumeros);
                 }
                 resultado = arvoreAuxiliar->valor;
-                apagaArvore(&arvoreAuxiliar);
             } else {
                 resultado = (*arv)->valor;
             }
         }
     }
-
+    apagaArvore(&arvoreAuxiliar);
     return resultado;
 }
 
@@ -231,8 +228,7 @@ void executaPrimeiraSomaImpar(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNum
                 auxIndice = auxIndice + 2;
                 nohAux1 = NULL;
                 nohAux2 = NULL;
-            }
-            else if (auxIndice == (quantidadeNumeros-1)) {
+            } else if (auxIndice == (quantidadeNumeros - 1)) {
                 nohAux1 = tPesq(&(*arv), (auxIndice + 1));
                 insArvoreIN(&(*arvoreAuxiliar), nohAux1->valor, auxIndice + 1);
             }
@@ -243,7 +239,7 @@ void executaPrimeiraSomaImpar(TREE *arv, TREE *arvoreAuxiliar, int quantidadeNum
 }
 
 void executaSubtracao(TREE *arvoreAuxiliar, int quantidadeNumeros) {
-    int resultado = 0, auxIndice = 0, i;
+    int resultado, auxIndice = 0, i;
     TREE nohAux1 = NULL, nohAux2 = NULL;
 
     for (i = 0; i < (quantidadeNumeros / 4); i++) {
@@ -261,7 +257,7 @@ void executaSubtracao(TREE *arvoreAuxiliar, int quantidadeNumeros) {
             auxIndice = nohAux2->indice;
         }
     }
-    if (quantidadeNumeros / 4 <= 0) {
+    if ((quantidadeNumeros / 4) <= 0) {
         resultado = (*arvoreAuxiliar)->valor - (*arvoreAuxiliar)->esq->valor;
         (*arvoreAuxiliar)->valor = resultado;
         tRemove(&(*arvoreAuxiliar), (*arvoreAuxiliar)->esq->valor);
@@ -309,24 +305,14 @@ int tRemove(TREE *arv, int vr) {
         else if (!(*arv)->dir)
             *arv = (*arv)->esq; // a raiz não tem filho direito
         else {
-            p = maiorABB(&((*arv)->esq));
-            (*arv)->valor = p->valor;
+            (*arv)->valor = (*arv)->esq->valor;
         }
         free(p);
 //        printf("Elemento encontrado e Removido\n");
     } else {
         tRemove(&((*arv)->esq), vr); //Procura na subarvore Esquerda
     }
-}
-
-static TREE maiorABB(TREE *abb) {
-    TREE p = *abb;
-    if (*abb)
-        if (p->dir == NULL) {
-            *abb = (*abb)->esq;
-            return p;
-        }
-    return maiorABB(&((*abb)->dir));
+    return 0;
 }
 
 void apagaArvore(TREE *arv) {
@@ -335,7 +321,6 @@ void apagaArvore(TREE *arv) {
     else {
         apagaArvore(&((*arv)->esq));
         apagaArvore(&((*arv)->dir));
-//        free(*arv);
     }
     free(*arv);
 }
