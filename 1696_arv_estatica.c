@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 struct noh {
     int info;
@@ -26,7 +27,7 @@ int main() {
     int limite, casosDeTeste, quantidadeNumeros, quantidadeSubstituicoes, valor, i, j, resposta, ordem, jogador;
     int valorA, valorB; //alocar em cada elemento, quanto devo somar ou subtrair da reposta
     int alturaArv, quantidadeFolhas;
-
+    clock_t startTime, endTime;
     TREE arvore = NULL;
     //TREE esq = NULL;
     TREE raiz = NULL;
@@ -37,7 +38,8 @@ int main() {
     jogador = 1;
 
     limite = 14;
-
+    //Início da contagem
+    startTime = clock();
     //Inserindo todos os elementos negativos
     for (i = 0; i < limite; i++) {
         criaArvore(&arvore);
@@ -109,7 +111,8 @@ int main() {
         jogador = jogador * -1;
         casosDeTeste = casosDeTeste - 1;
     }
-
+    endTime = clock();
+    printf("Tempo de execução: [%lu] segundos", ((endTime - startTime)/CLOCKS_PER_SEC));
     return 0;
 
 }
