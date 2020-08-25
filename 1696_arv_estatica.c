@@ -36,7 +36,7 @@ int main() {
      * */
     jogador = 1;
 
-    limite = 13;
+    limite = 14;
 
     //Inserindo todos os elementos negativos
     for (i = 0; i < limite; i++) {

@@ -84,10 +84,10 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/ruben/CLionProjects/1696_EDPA/1696yuri.c">
+		<Unit filename="/home/ruben/CLionProjects/1696_EDPA/1696_arv_estatica.c">
 			<Option target="1696_EDPA"/>
 		</Unit>
-		<Unit filename="/home/ruben/CLionProjects/1696_EDPA/teste.txt">
+		<Unit filename="/home/ruben/CLionProjects/1696_EDPA/Casos de teste/Grupo 1/grupo1 - 5.txt">
 			<Option target="1696_EDPA"/>
 		</Unit>
 		<Unit filename="/home/ruben/CLionProjects/1696_EDPA/CMakeLists.txt">
